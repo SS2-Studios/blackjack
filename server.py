@@ -55,8 +55,13 @@ server_socket.listen(2)  # Samo 2 korisnika mogu da se povežu
 
 # Funkcija za slanje stanja igračima
 def send_game_state(players, player_data):
-    for player in players:
-        player.send(pickle.dumps(player_data))
+    for player_socket in players:
+        # Samo šaljemo podatke o igračima, bez soketa
+        player_data_without_sockets = {
+            player_socket.getpeername(): player_data[player_socket]
+            for player_socket in player_data.keys()
+        }
+        player_socket.send(pickle.dumps(player_data_without_sockets))
 
 # Glavna logika servera
 def game_loop():
@@ -147,3 +152,4 @@ def game_loop():
 
 if __name__ == "__main__":
     game_loop()
+
